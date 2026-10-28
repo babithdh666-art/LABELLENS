@@ -8,10 +8,15 @@ from pathlib import Path
 import pytesseract
 import os
 
-pytesseract.pytesseract.tesseract_cmd = os.getenv(
-    "TESSERACT_CMD",
-    r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-)
+tesseract_path = os.getenv("TESSERACT_CMD") or shutil.which("tesseract")
+
+if not tesseract_path and os.name == "nt":
+    windows_path = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    if os.path.isfile(windows_path):
+        tesseract_path = windows_path
+
+if tesseract_path:
+    pytesseract.pytesseract.tesseract_cmd = tesseract_path
 import streamlit as st
 from PIL import Image, ImageOps, UnidentifiedImageError
 from pytesseract import TesseractNotFoundError
